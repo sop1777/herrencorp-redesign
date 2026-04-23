@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HERREN - 파괴적 혁신으로 더 나은 삶을 만듭니다</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  /* ===== Reset & Base ===== */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --primary: #227EFF;
+    --primary-dark: #1a65cc;
+    --gradient: linear-gradient(135deg, #227EFF 0%, #6d5aff 100%);
+    --gradient-subtle: linear-gradient(135deg, rgba(34,126,255,0.08) 0%, rgba(109,90,255,0.08) 100%);
+    --bg: #FFFFFF;
+    --bg-alt: #F6F7FB;
+    --text: #20232B;
+    --text-sub: #606268;
+    --text-muted: #9FA1A4;
+    --border: #E8E9EC;
+    --card-shadow: 0 2px 20px rgba(34,126,255,0.06);
+    --card-shadow-hover: 0 8px 40px rgba(34,126,255,0.12);
+    --radius: 20px;
+    --radius-sm: 12px;
+    --max-w: 1140px;
+    --nav-h: 72px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+
+  /* ===== 스크롤 애니메이션 ===== */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .delay-1 { transition-delay: 0.1s; }
+  .delay-2 { transition-delay: 0.2s; }
+  .delay-3 { transition-delay: 0.3s; }
+  .delay-4 { transition-delay: 0.4s; }
+
+  /* ===== Navigation ===== */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-h);
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    z-index: 1000;
+    transition: box-shadow 0.3s;
+  }
+  .nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.06); }
+  .nav-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-logo {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-sub);
+    font-size: 15px;
+    font-weight: 500;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a:hover { color: var(--primary); }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--gradient);
+    border-radius: 1px;
+    transition: width 0.3s;
+  }
+  .nav-links a:hover::after { width: 100%; }
+  .btn-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: var(--gradient);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(34,126,255,0.3);
+  }
+  .btn-cta::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  .btn-cta:hover::after { left: 100%; }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover {
+    background: var(--gradient);
+    color: #fff;
+    border-color: transparent;
+    transform: translateY(-2px);
+  }
+
+  /* ===== Hero ===== */
+  .hero {
+    padding-top: calc(var(--nav-h) + 80px);
+    padding-bottom: 100px;
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(34,126,255,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -150px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(109,90,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-inner {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-text { flex: 1; }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    background: var(--gradient-subtle);
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 24px;
+  }
+  .hero-badge span {
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+    animation: pulse-dot 2s infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.5); }
+  }
+  .hero h1 {
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -1.5px;
+    margin-bottom: 24px;
+    word-break: keep-all;
+  }
+  .hero h1 .gradient-text {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: 18px;
+    color: var(--text-sub);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 520px;
+  }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+  .hero-visual {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    position: relative;
+  }
+  .hero-card-stack {
+    position: relative;
+    width: 400px;
+    height: 420px;
+  }
+  .float-card {
+    position: absolute;
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: 28px;
+    border: 1px solid var(--border);
+    transition: transform 0.3s;
+  }
+  .float-card:hover { transform: translateY(-4px); }
+  .float-card-1 {
+    top: 0; left: 0;
+    width: 280px;
+    animation: float-1 6s ease-in-out infinite;
+  }
+  .float-card-2 {
+    top: 80px; right: 0;
+    width: 240px;
+    animation: float-2 5s ease-in-out infinite;
+  }
+  .float-card-3 {
+    bottom: 0; left: 40px;
+    width: 260px;
+    animation: float-3 7s ease-in-out infinite;
+  }
+  @keyframes float-1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+  @keyframes float-2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  @keyframes float-3 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+  .float-card .icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  .float-card .icon.blue { background: rgba(34,126,255,0.1); }
+  .float-card .icon.purple { background: rgba(109,90,255,0.1); }
+  .float-card .icon.green { background: rgba(16,185,129,0.1); }
+  .float-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .float-card p { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0; }
+
+  /* ===== Stats ===== */
+  .stats {
+    padding: 80px 0;
+    background: var(--bg-alt);
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  .stat-card {
+    text-align: center;
+    padding: 40px 20px;
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+  }
+  .stat-number {
+    font-size: 44px;
+    font-weight: 800;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .stat-label {
+    font-size: 15px;
+    color: var(--text-sub);
+    font-weight: 500;
+  }
+
+  /* ===== Section Common ===== */
+  .section { padding: 120px 0; }
+  .section-alt { background: var(--bg-alt); }
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: var(--gradient-subtle);
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .section-title {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1.3;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+    word-break: keep-all;
+  }
+  .section-desc {
+    font-size: 17px;
+    color: var(--text-sub);
+    line-height: 1.7;
+    max-width: 600px;
+    margin-bottom: 48px;
+  }
+  .section-center { text-align: center; }
+  .section-center .section-desc { margin-left: auto; margin-right: auto; }
+
+  /* ===== About ===== */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .about-content .section-desc { margin-bottom: 32px; }
+  .about-highlight {
+    padding: 24px;
+    background: var(--gradient-subtle);
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--primary);
+  }
+  .about-highlight p {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.7;
+    font-weight: 500;
+  }
+  .about-visual {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+  .about-img-wrapper {
+    width: 100%;
+    aspect-ratio: 4/3;
+    border-radius: var(--radius);
+    background: var(--gradient);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .about-img-wrapper .overlay-text {
+    color: #fff;
+    text-align: center;
+    z-index: 1;
+  }
+  .about-img-wrapper .overlay-text .big {
+    font-size: 64px;
+    font-weight: 800;
+    display: block;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .about-img-wrapper .overlay-text .sub {
+    font-size: 18px;
+    font-weight: 500;
+    opacity: 0.9;
+  }
+  .about-img-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.15) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  /* ===== Teams ===== */
+  .teams-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .team-card {
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: default;
+  }
+  .team-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--card-shadow-hover);
+  }
+  .team-card-header {
+    padding: 48px 36px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .team-card:nth-child(1) .team-card-header {
+    background: linear-gradient(135deg, #227EFF 0%, #4d9bff 100%);
+  }
+  .team-card:nth-child(2) .team-card-header {
+    background: linear-gradient(135deg, #6d5aff 0%, #9b8bff 100%);
+  }
+  .team-card-header::after {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+  }
+  .team-card-header h3 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .team-card-header p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.6;
+    position: relative;
+  }
+  .team-card-body {
+    padding: 32px 36px;
+  }
+  .team-card-body p {
+    font-size: 15px;
+    color: var(--text-sub);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+  .team-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .team-tag {
+    padding: 6px 14px;
+    background: var(--gradient-subtle);
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--primary);
+  }
+
+  /* ===== Culture ===== */
+  .culture-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .culture-card {
+    padding: 36px;
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .culture-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+  }
+  .culture-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+    background: var(--gradient-subtle);
+  }
+  .culture-card h4 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .culture-card p {
+    font-size: 14px;
+    color: var(--text-sub);
+    line-height: 1.7;
+  }
+
+  /* ===== History / Timeline ===== */
+  .timeline {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+    transform: translateX(-50%);
+  }
+  .timeline-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 40px;
+    position: relative;
+  }
+  .timeline-item:nth-child(odd) { flex-direction: row-reverse; }
+  .timeline-dot {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    width: 16px;
+    height: 16px;
+    background: var(--gradient);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 3px rgba(34,126,255,0.2);
+    z-index: 1;
+  }
+  .timeline-content {
+    width: calc(50% - 40px);
+    padding: 20px 24px;
+    background: #fff;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .timeline-content:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow);
+  }
+  .timeline-year {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 6px;
+  }
+  .timeline-text {
+    font-size: 15px;
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  /* ===== CTA / Career ===== */
+  .cta-section {
+    padding: 120px 0;
+    background: var(--gradient);
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+  .cta-section::after {
+    content: '';
+    position: absolute;
+    bottom: -80px;
+    left: -80px;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+  .cta-inner {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .cta-inner h2 {
+    font-size: 44px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+  }
+  .cta-inner p {
+    font-size: 18px;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 40px;
+    line-height: 1.7;
+  }
+  .btn-white {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 36px;
+    background: #fff;
+    color: var(--primary);
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-white:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    padding: 60px 0 40px;
+    background: #1a1d26;
+    color: #fff;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 48px;
+  }
+  .footer-brand h3 {
+    font-size: 22px;
+    font-weight: 800;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+  .footer-brand p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.7;
+  }
+  .footer-col h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: rgba(255,255,255,0.9);
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 10px; }
+  .footer-col a {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-col a:hover { color: var(--primary); }
+  .footer-bottom {
+    padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-bottom p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+  }
+  .footer-info {
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+    line-height: 1.8;
+  }
+
+  /* ===== Marquee ===== */
+  .marquee-section {
+    padding: 48px 0;
+    overflow: hidden;
+    background: var(--bg-alt);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 48px;
+    animation: marquee 25s linear infinite;
+    width: max-content;
+  }
+  .marquee-item {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-muted);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .marquee-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--gradient);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ===== Mobile Menu ===== */
+  .mobile-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .mobile-toggle span {
+    width: 22px;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: 0.3s;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 1024px) {
+    .hero h1 { font-size: 40px; }
+    .hero-inner { flex-direction: column; gap: 40px; }
+    .hero-card-stack { width: 340px; height: 360px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    .teams-grid { grid-template-columns: 1fr; }
+    .culture-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-grid { grid-template-columns: repeat(2, 1fr); }
+    .section-title { font-size: 32px; }
+  }
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .mobile-toggle { display: flex; }
+    .nav-links.open {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: var(--nav-h);
+      left: 0;
+      right: 0;
+      background: #fff;
+      padding: 24px;
+      gap: 20px;
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+    .hero { padding-top: calc(var(--nav-h) + 48px); padding-bottom: 60px; min-height: auto; }
+    .hero h1 { font-size: 32px; }
+    .hero p { font-size: 16px; }
+    .hero-card-stack { width: 100%; max-width: 320px; height: 340px; }
+    .float-card { padding: 20px; }
+    .float-card-1 { width: 220px; }
+    .float-card-2 { width: 200px; }
+    .float-card-3 { width: 220px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .stat-number { font-size: 32px; }
+    .section { padding: 80px 0; }
+    .section-title { font-size: 28px; }
+    .culture-grid { grid-template-columns: 1fr; }
+    .timeline::before { left: 20px; }
+    .timeline-item { flex-direction: row !important; }
+    .timeline-dot { left: 20px; }
+    .timeline-content { width: calc(100% - 56px); margin-left: 56px !important; margin-right: 0 !important; }
+    .cta-inner h2 { font-size: 32px; }
+    .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+    .footer-bottom { flex-direction: column; text-align: center; }
+  }
+
+  /* Timeline 아이템 정렬 보정 */
+  .timeline-item:nth-child(odd) .timeline-content { margin-right: auto; margin-left: 0; }
+  .timeline-item:nth-child(even) .timeline-content { margin-left: auto; margin-right: 0; }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">HERREN</div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#about">About</a></li>
+      <li><a href="#teams">Teams</a></li>
+      <li><a href="#culture">Culture</a></li>
+      <li><a href="#history">History</a></li>
+      <li><a href="#career" class="btn-cta">JOIN US</a></li>
+    </ul>
+    <button class="mobile-toggle" id="mobileToggle" onclick="document.getElementById('navLinks').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-text fade-up">
+        <div class="hero-badge"><span></span>Since 2016</div>
+        <h1>
+          사람들이 더 나은 삶을<br>
+          경험하도록<br>
+          <span class="gradient-text">파괴적 혁신</span>을 만듭니다
+        </h1>
+        <p>
+          단순하고 저렴한 서비스로 시장의 판도를 바꾸는
+          Disruptive Innovation. 헤렌은 자사 서비스를 통해
+          수익을 내며 빠르게 성장 중인 내실 있는 스타트업입니다.
+        </p>
+        <div class="hero-actions">
+          <a href="#teams" class="btn-cta">서비스 알아보기 &rarr;</a>
+          <a href="#career" class="btn-outline">채용 공고</a>
+        </div>
+      </div>
+      <div class="hero-visual fade-up delay-2">
+        <div class="hero-card-stack">
+          <div class="float-card float-card-1">
+            <div class="icon blue">&#x2728;</div>
+            <h4>공비서</h4>
+            <p>IT 기술로 뷰티서비스 시장의 혁신을 만들어갑니다</p>
+          </div>
+          <div class="float-card float-card-2">
+            <div class="icon purple">&#x1F680;</div>
+            <h4>브랜다즈</h4>
+            <p>세상 모든 브랜드의 A부터 Z까지</p>
+          </div>
+          <div class="float-card float-card-3">
+            <div class="icon green">&#x1F4C8;</div>
+            <h4>매출 75억 돌파</h4>
+            <p>2024년 12월 기준, 꾸준한 성장</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Marquee -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <div class="marquee-item"><div class="marquee-dot"></div>Disruptive Innovation</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Beauty Service Platform</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Marketing Solution</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Data-Driven Growth</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>OKR Culture</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Since 2016</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Disruptive Innovation</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Beauty Service Platform</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Marketing Solution</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Data-Driven Growth</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>OKR Culture</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Since 2016</div>
+  </div>
+</div>
+
+<!-- Stats -->
+<section class="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card fade-up">
+        <div class="stat-number">75억+</div>
+        <div class="stat-label">연간 매출</div>
+      </div>
+      <div class="stat-card fade-up delay-1">
+        <div class="stat-number">40,000+</div>
+        <div class="stat-label">공비서 가입샵</div>
+      </div>
+      <div class="stat-card fade-up delay-2">
+        <div class="stat-number">100만+</div>
+        <div class="stat-label">누적 고객</div>
+      </div>
+      <div class="stat-card fade-up delay-3">
+        <div class="stat-number">8년+</div>
+        <div class="stat-label">성장 히스토리</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-content">
+        <div class="fade-up">
+          <div class="section-label">About Herren</div>
+          <h2 class="section-title">
+            고객의 문제를 먼저<br>
+            발견하고 해결합니다
+          </h2>
+        </div>
+        <p class="section-desc fade-up delay-1">
+          2016년 9월 설립 이후, 자사 서비스를 통해 수익을 내며
+          빠른 속도로 성장 중인 내실 있는 스타트업입니다.
+          데이터와 기술력을 통해 창의적인 해결 방법을 제시합니다.
+        </p>
+        <div class="about-highlight fade-up delay-2">
+          <p>
+            파괴적 혁신(Disruptive Innovation)은 단순하고 저렴한
+            서비스로 기존 시장의 판도를 완전히 바꾸는 혁신 전략입니다.
+            헤렌은 이 철학으로 뷰티서비스와 마케팅 시장을 변화시킵니다.
+          </p>
+        </div>
+      </div>
+      <div class="about-visual fade-up delay-2">
+        <div class="about-img-wrapper">
+          <div class="overlay-text">
+            <span class="big">2016</span>
+            <span class="sub">서울 성수동에서 시작</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Teams -->
+<section class="section section-alt" id="teams">
+  <div class="container">
+    <div class="section-center fade-up">
+      <div class="section-label">Our Teams</div>
+      <h2 class="section-title">두 팀이 만드는 혁신</h2>
+      <p class="section-desc">
+        각 팀은 독립적인 서비스를 운영하며,
+        자체 수익으로 빠르게 성장하고 있습니다.
+      </p>
+    </div>
+    <div class="teams-grid">
+      <div class="team-card fade-up delay-1">
+        <div class="team-card-header">
+          <h3>공비서</h3>
+          <p>IT 기술로 뷰티서비스 시장의 혁신을 만들어 나가겠습니다</p>
+        </div>
+        <div class="team-card-body">
+          <p>
+            네일, 피부관리, 속눈썹, 왁싱, 미용실 등 뷰티서비스 전반을
+            아우르는 플랫폼입니다. 40,000개 이상의 샵이 가입해 있으며,
+            누적 100만 고객이 이용하고 있습니다.
+          </p>
+          <div class="team-tags">
+            <span class="team-tag">뷰티 플랫폼</span>
+            <span class="team-tag">40,000+ 샵</span>
+            <span class="team-tag">100만 고객</span>
+          </div>
+        </div>
+      </div>
+      <div class="team-card fade-up delay-2">
+        <div class="team-card-header">
+          <h3>브랜다즈</h3>
+          <p>세상 모든 브랜드의 A부터 Z까지, 마케팅의 완성</p>
+        </div>
+        <div class="team-card-body">
+          <p>
+            브랜드를 위한 종합 마케팅 솔루션을 제공합니다.
+            인플루언서 마케팅부터 퍼포먼스 마케팅까지,
+            데이터 기반의 마케팅 전략을 실행합니다.
+          </p>
+          <div class="team-tags">
+            <span class="team-tag">마케팅 솔루션</span>
+            <span class="team-tag">인플루언서</span>
+            <span class="team-tag">퍼포먼스</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Culture -->
+<section class="section" id="culture">
+  <div class="container">
+    <div class="section-center fade-up">
+      <div class="section-label">Culture</div>
+      <h2 class="section-title">일하는 방식이 다릅니다</h2>
+      <p class="section-desc">
+        OKR 기반의 업무 방식으로 구성원 모두가
+        도전적인 목표를 세우고 함께 달성해 나갑니다.
+      </p>
+    </div>
+    <div class="culture-grid">
+      <div class="culture-card fade-up delay-1">
+        <div class="culture-icon">&#x1F3AF;</div>
+        <h4>OKR 기반 목표 설정</h4>
+        <p>
+          구성원 모두가 도전적인 목표를 세우고,
+          핵심 결과를 통해 성과를 측정합니다.
+          목표 달성 과정에서 함께 성장합니다.
+        </p>
+      </div>
+      <div class="culture-card fade-up delay-2">
+        <div class="culture-icon">&#x1F4A1;</div>
+        <h4>데이터 중심 사고</h4>
+        <p>
+          감이 아닌 데이터로 의사결정합니다.
+          고객의 문제를 먼저 발견하고,
+          기술력으로 창의적 해결책을 제시합니다.
+        </p>
+      </div>
+      <div class="culture-card fade-up delay-3">
+        <div class="culture-icon">&#x1F91D;</div>
+        <h4>협업과 긍정적 변화</h4>
+        <p>
+          팀원 간의 긴밀한 협업을 통해
+          더 큰 가치를 만들어갑니다.
+          긍정적 변화를 추구하는 문화입니다.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- History -->
+<section class="section section-alt" id="history">
+  <div class="container">
+    <div class="section-center fade-up">
+      <div class="section-label">History</div>
+      <h2 class="section-title">헤렌의 여정</h2>
+      <p class="section-desc">
+        2016년 설립부터 지금까지, 꾸준한 성장의 기록
+      </p>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item fade-up">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-year">2024.12</div>
+          <div class="timeline-text">매출 75억 돌파</div>
+        </div>
+      </div>
+      <div class="timeline-item fade-up delay-1">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-year">2023.01</div>
+          <div class="timeline-text">청년친화강소기업 선정</div>
+        </div>
+      </div>
+      <div class="timeline-item fade-up delay-2">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-year">2022.03</div>
+          <div class="timeline-text">공비서 가입샵 40,000개 돌파</div>
+        </div>
+      </div>
+      <div class="timeline-item fade-up">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-year">2020.10</div>
+          <div class="timeline-text">본사 확장 이전 (성수동)</div>
+        </div>
+      </div>
+      <div class="timeline-item fade-up delay-1">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-year">2020.07</div>
+          <div class="timeline-text">공비서 관리샵 10,000개 / 고객 100만 돌파</div>
+        </div>
+      </div>
+      <div class="timeline-item fade-up delay-2">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-year">2020.01</div>
+          <div class="timeline-text">특허 등록 (인플루언서 마케팅)</div>
+        </div>
+      </div>
+      <div class="timeline-item fade-up">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-year">2019.06</div>
+          <div class="timeline-text">공비서 관리샵 5,000개 / 고객 50만 돌파</div>
+        </div>
+      </div>
+      <div class="timeline-item fade-up delay-1">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-year">2018</div>
+          <div class="timeline-text">벤처기업 인증 / 병역지정업체 선정</div>
+        </div>
+      </div>
+      <div class="timeline-item fade-up delay-2">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-year">2017.07</div>
+          <div class="timeline-text">공비서 서비스 런칭</div>
+        </div>
+      </div>
+      <div class="timeline-item fade-up">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-year">2016.09</div>
+          <div class="timeline-text">헤렌 설립</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / Career -->
+<section class="cta-section" id="career">
+  <div class="container">
+    <div class="cta-inner fade-up">
+      <h2>함께 혁신을 만들어갈<br>동료를 찾습니다</h2>
+      <p>
+        데이터와 기술로 시장의 판도를 바꾸는 일,<br>
+        헤렌에서 함께 도전하세요.
+      </p>
+      <a href="mailto:recruit@herren.co.kr" class="btn-white">
+        채용 문의하기 &rarr;
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>HERREN</h3>
+        <p>
+          사람들이 더 나은 삶의 질을 경험하도록<br>
+          문제를 해결하고, 파괴적 혁신을 만듭니다.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>Teams</h4>
+        <ul>
+          <li><a href="#">공비서</a></li>
+          <li><a href="#">브랜다즈</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#culture">Culture</a></li>
+          <li><a href="#history">History</a></li>
+          <li><a href="#career">Career</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:recruit@herren.co.kr">recruit@herren.co.kr</a></li>
+          <li><a href="mailto:management@herren.co.kr">management@herren.co.kr</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>Copyright &copy; 2016 Herren Co., Ltd. All rights reserved.</p>
+      <div class="footer-info">
+        대표 장진웅 | 사업자번호 701-87-00540<br>
+        서울시 성동구 성수일로8길 5, 서울숲 SK V1 Tower 3F
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // 네비게이션 스크롤 효과
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 10);
+  });
+
+  // 스크롤 등장 애니메이션
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // 숫자 카운트업 애니메이션
+  const countObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const text = el.textContent;
+        const match = text.match(/([\d,]+)/);
+        if (!match) return;
+
+        const numStr = match[1].replace(/,/g, '');
+        const target = parseInt(numStr);
+        const suffix = text.replace(match[0], '');
+        const prefix = text.substring(0, text.indexOf(match[0]));
+        const duration = 1500;
+        const start = performance.now();
+
+        const animate = (now) => {
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = Math.floor(target * eased);
+          el.textContent = prefix + current.toLocaleString() + suffix;
+          if (progress < 1) requestAnimationFrame(animate);
+        };
+        requestAnimationFrame(animate);
+        countObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('.stat-number').forEach(el => countObserver.observe(el));
+</script>
+</body>
+</html>
