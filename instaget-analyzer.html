@@ -265,8 +265,9 @@ function renderChatResults(data) {
   var following = data.following || 0;
   var posts = data.posts || 0;
 
-  var initial = (data.username || '?').charAt(0).toUpperCase();
-  var profileImg = '<div class="chat-profile-img-placeholder">' + initial + '</div>';
+  // UI Avatars API로 프로필 이미지 생성 (유저네임 기반)
+  var avatarUrl = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(data.username) + '&background=6366f1&color=fff&size=96&bold=true&length=2';
+  var profileImg = '<img class="chat-profile-img" src="' + avatarUrl + '" alt="' + data.username + '" />';
 
   addBotMsg(
     '<div class="chat-profile">' +
