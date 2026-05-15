@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INSTAGET - Account Analyzer</title>
+<title>INSTAGET - Growth Consultant</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; background: #1a1a2e; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-
   .demo-bg { text-align: center; color: #fff; padding: 40px 20px; }
   .demo-bg h1 { font-size: 32px; font-weight: 800; margin-bottom: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .demo-bg p { color: rgba(255,255,255,0.5); font-size: 14px; line-height: 1.6; }
@@ -19,13 +18,11 @@
     border: none; cursor: pointer;
     box-shadow: 0 4px 20px rgba(99,102,241,0.4);
     display: flex; align-items: center; justify-content: center;
-    transition: transform 0.2s, box-shadow 0.2s;
-    color: #fff; font-size: 24px;
+    transition: transform 0.2s; color: #fff; font-size: 24px;
   }
-  .widget-trigger:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(99,102,241,0.5); }
+  .widget-trigger:hover { transform: scale(1.08); }
   .widget-trigger.open .icon-open { display: none; }
   .widget-trigger:not(.open) .icon-close { display: none; }
-  /* 깜빡이는 알림 뱃지 */
   .widget-trigger::after {
     content: '1'; position: absolute; top: -2px; right: -2px;
     width: 20px; height: 20px; border-radius: 50%; background: #ef4444;
@@ -33,18 +30,18 @@
     animation: pulse 2s infinite;
   }
   .widget-trigger.open::after { display: none; }
-  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
 
   .widget-panel {
     position: fixed; bottom: 96px; right: 24px; z-index: 9998;
-    width: 380px; max-height: 620px;
+    width: 400px; max-height: 640px;
     background: #fff; border-radius: 16px;
     box-shadow: 0 8px 40px rgba(0,0,0,0.2);
     display: none; flex-direction: column; overflow: hidden;
     animation: slideUp 0.3s ease;
   }
   .widget-panel.show { display: flex; }
-  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
   .widget-header {
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
@@ -59,7 +56,7 @@
   .widget-body {
     flex: 1; overflow-y: auto; padding: 16px;
     display: flex; flex-direction: column; gap: 12px;
-    max-height: 430px;
+    max-height: 450px;
   }
   .widget-body::-webkit-scrollbar { width: 4px; }
   .widget-body::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
@@ -69,51 +66,57 @@
   .msg-user { flex-direction: row-reverse; }
   .msg-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, #6366f1, #8b5cf6); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; }
   .msg-user .msg-avatar { background: #e5e7eb; color: #666; }
-  .msg-bubble { max-width: 280px; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5; }
+  .msg-bubble { max-width: 290px; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.6; }
   .msg-bot .msg-bubble { background: #f3f4f6; color: #333; border-top-left-radius: 4px; }
   .msg-user .msg-bubble { background: #6366f1; color: #fff; border-top-right-radius: 4px; }
 
+  /* 선택 버튼 */
+  .choice-wrap { display: flex; flex-direction: column; gap: 6px; max-width: 290px; }
+  .choice-btn {
+    display: block; width: 100%; padding: 10px 14px; background: #fff; border: 1.5px solid #6366f1;
+    border-radius: 10px; font-size: 13px; font-weight: 600; color: #6366f1;
+    cursor: pointer; text-align: left; transition: all 0.2s;
+  }
+  .choice-btn:hover { background: #6366f1; color: #fff; }
+  .choice-btn .sub { font-size: 11px; font-weight: 400; color: #888; display: block; margin-top: 2px; }
+  .choice-btn:hover .sub { color: rgba(255,255,255,0.7); }
+
+  /* 프로필 카드 */
   .chat-profile { background: #f8f9fc; border-radius: 14px; padding: 16px; max-width: 300px; }
   .chat-profile-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
   .chat-profile-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #e5e7eb; }
   .chat-profile-name { font-weight: 700; font-size: 15px; }
   .chat-profile-fullname { font-size: 12px; color: #888; }
-  .chat-profile-bio { font-size: 12px; color: #666; margin-top: 4px; line-height: 1.3; }
   .chat-profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
   .chat-stat-num { font-size: 16px; font-weight: 800; color: #6366f1; }
   .chat-stat-label { font-size: 11px; color: #888; }
 
-  .chat-score { display: flex; align-items: center; gap: 12px; background: #f8f9fc; border-radius: 14px; padding: 16px; max-width: 300px; }
-  .chat-score-circle { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; flex-shrink: 0; }
-  .chat-score-circle.good { background: #dcfce7; color: #16a34a; }
-  .chat-score-circle.warn { background: #fef9c3; color: #ca8a04; }
-  .chat-score-circle.bad { background: #fee2e2; color: #dc2626; }
-  .chat-score-text { font-size: 13px; line-height: 1.4; color: #555; }
-  .chat-score-text strong { color: #222; }
+  /* 로드맵 */
+  .roadmap { background: #f8f9fc; border-radius: 14px; padding: 16px; max-width: 300px; }
+  .roadmap h4 { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+  .roadmap-step { display: flex; gap: 10px; margin-bottom: 14px; position: relative; }
+  .roadmap-step:last-child { margin-bottom: 0; }
+  .roadmap-dot { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; }
+  .roadmap-dot.step1 { background: #6366f1; }
+  .roadmap-dot.step2 { background: #8b5cf6; }
+  .roadmap-dot.step3 { background: #a855f7; }
+  .roadmap-line { position: absolute; left: 11px; top: 24px; width: 2px; height: calc(100% - 10px); background: #e5e7eb; }
+  .roadmap-step:last-child .roadmap-line { display: none; }
+  .roadmap-content { flex: 1; }
+  .roadmap-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .roadmap-desc { font-size: 12px; color: #666; line-height: 1.4; }
+  .roadmap-products { margin-top: 4px; }
+  .roadmap-product { display: inline-block; font-size: 11px; padding: 2px 8px; background: #eef2ff; color: #6366f1; border-radius: 4px; margin: 2px 2px 0 0; font-weight: 600; }
 
-  .chat-diag { background: #f8f9fc; border-radius: 14px; padding: 14px; max-width: 300px; }
-  .chat-diag-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
-  .chat-diag-item:last-child { margin-bottom: 0; }
-  .chat-diag-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
-  .chat-diag-dot.bad { background: #ef4444; }
-  .chat-diag-dot.warn { background: #eab308; }
-  .chat-diag-dot.good { background: #22c55e; }
-  .chat-diag-text { font-size: 13px; color: #555; line-height: 1.4; }
-
+  /* 추천 카드 */
   .chat-rec { background: #fff; border: 1.5px solid #6366f1; border-radius: 14px; padding: 14px; max-width: 300px; cursor: pointer; transition: transform 0.2s; }
   .chat-rec:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.15); }
   .chat-rec-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; }
-  .chat-rec-tag.urgent { background: #fee2e2; color: #dc2626; }
-  .chat-rec-tag.recommend { background: #dbeafe; color: #2563eb; }
-  .chat-rec-tag.optional { background: #f3f4f6; color: #6b7280; }
+  .chat-rec-tag.start { background: #dcfce7; color: #16a34a; }
   .chat-rec-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
   .chat-rec-desc { font-size: 12px; color: #888; line-height: 1.4; margin-bottom: 8px; }
   .chat-rec-btn { display: inline-block; padding: 8px 16px; background: #6366f1; color: #fff; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; }
   .chat-rec-btn:hover { background: #4f46e5; }
-
-  /* 체험 계정 버튼 */
-  .try-btn { display: inline-block; padding: 6px 12px; background: #eef2ff; color: #6366f1; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; margin: 2px; transition: background 0.2s; border: 1px solid #c7d2fe; }
-  .try-btn:hover { background: #c7d2fe; }
 
   .widget-input {
     padding: 12px 16px; border-top: 1px solid #f0f0f0; flex-shrink: 0;
@@ -121,7 +124,7 @@
   }
   .widget-input input {
     flex: 1; padding: 10px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px;
-    font-size: 14px; outline: none; transition: border 0.2s;
+    font-size: 14px; outline: none;
   }
   .widget-input input:focus { border-color: #6366f1; }
   .widget-input input::placeholder { color: #bbb; }
@@ -137,7 +140,10 @@
   .typing-dots span:nth-child(1) { animation-delay: 0s; }
   .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
   .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes bounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+  @keyframes bounce { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+
+  .try-btn { display: inline-block; padding: 6px 12px; background: #eef2ff; color: #6366f1; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; margin: 2px; border: 1px solid #c7d2fe; }
+  .try-btn:hover { background: #c7d2fe; }
 
   .widget-footer { text-align: center; padding: 8px; font-size: 11px; color: #bbb; border-top: 1px solid #f5f5f5; flex-shrink: 0; }
   .widget-footer span { color: #6366f1; font-weight: 600; }
@@ -150,8 +156,8 @@
 <body>
 
 <div class="demo-bg">
-  <h1>INSTAGET Account Analyzer</h1>
-  <p>인스타그램 계정을 분석하고<br>맞춤 성장 솔루션을 추천합니다</p>
+  <h1>INSTAGET Growth Consultant</h1>
+  <p>계정 분석부터 맞춤 성장 로드맵까지<br>AI가 상담해드립니다</p>
 </div>
 
 <button class="widget-trigger" id="triggerBtn" onclick="toggleWidget()">
@@ -165,41 +171,35 @@
       <div class="widget-logo">IG</div>
       <h3>INSTAGET</h3>
     </div>
-    <p class="widget-header-sub"><span class="widget-header-status"></span>계정 분석 상담 운영 중</p>
+    <p class="widget-header-sub"><span class="widget-header-status"></span>성장 컨설턴트 상담 중</p>
   </div>
-
-  <div class="widget-body" id="chatBody">
-    <div class="msg msg-bot">
-      <div class="msg-avatar">IG</div>
-      <div class="msg-bubble">
-        안녕하세요! INSTAGET 계정 분석기입니다.<br><br>
-        분석하고 싶은 인스타그램 <b>공개 계정의 유저네임</b>을 입력해주세요.<br><br>
-        <span style="font-size:12px;color:#888;">또는 아래 계정을 눌러 체험해보세요</span><br>
-        <span class="try-btn" onclick="tryAccount('bts.bighitofficial')">bts.bighitofficial</span>
-        <span class="try-btn" onclick="tryAccount('blackpinkofficial')">blackpinkofficial</span>
-        <span class="try-btn" onclick="tryAccount('instaget_official')">instaget_official</span>
-      </div>
-    </div>
-  </div>
-
+  <div class="widget-body" id="chatBody"></div>
   <div class="widget-input">
-    <input type="text" id="chatInput" placeholder="@username 입력" onkeydown="if(event.key==='Enter')sendMessage()" />
-    <button id="sendBtn" onclick="sendMessage()">분석</button>
+    <input type="text" id="chatInput" placeholder="@username 입력" onkeydown="if(event.key==='Enter')handleInput()" />
+    <button id="sendBtn" onclick="handleInput()">전송</button>
   </div>
   <div class="widget-footer">Powered by <span>INSTAGET</span></div>
 </div>
 
 <script>
-var DEMO_ACCOUNTS = {
-  'bts.bighitofficial': { fullName: 'BTS official', followers: 80000000, following: 13, posts: 58, bio: "BTS 'ARIRANG' OUT NOW", pic: 'https://ui-avatars.com/api/?name=BTS&background=7c3aed&color=fff&size=96&bold=true' },
-  'blackpinkofficial': { fullName: 'BLACKPINK', followers: 68000000, following: 5, posts: 492, bio: 'BLACKPINK IN YOUR AREA', pic: 'https://ui-avatars.com/api/?name=BP&background=ec4899&color=fff&size=96&bold=true' },
-  'roses_are_rosie': { fullName: 'ROSE', followers: 78000000, following: 52, posts: 873, bio: 'rosie', pic: 'https://ui-avatars.com/api/?name=ROSE&background=f472b6&color=fff&size=96&bold=true' },
-  'instaget_official': { fullName: 'INSTAGET', followers: 1250, following: 320, posts: 87, bio: 'Instagram Growth Solution', pic: 'https://ui-avatars.com/api/?name=IG&background=6366f1&color=fff&size=96&bold=true' },
-  'nike': { fullName: 'Nike', followers: 306000000, following: 141, posts: 1203, bio: 'Just Do It.', pic: 'https://ui-avatars.com/api/?name=NK&background=111&color=fff&size=96&bold=true' },
-  'starbucks': { fullName: 'Starbucks Coffee', followers: 18000000, following: 42, posts: 1890, bio: 'Inspiring and nurturing the human spirit.', pic: 'https://ui-avatars.com/api/?name=SB&background=00704a&color=fff&size=96&bold=true' },
-  'gopro': { fullName: 'GoPro', followers: 20000000, following: 458, posts: 7200, bio: 'Capture + share your world.', pic: 'https://ui-avatars.com/api/?name=GP&background=0085ca&color=fff&size=96&bold=true' },
-  'sample_shop': { fullName: 'Sample Beauty Shop', followers: 3200, following: 890, posts: 145, bio: '', pic: 'https://ui-avatars.com/api/?name=SS&background=e879a8&color=fff&size=96&bold=true' },
-  'my_new_account': { fullName: '', followers: 127, following: 243, posts: 8, bio: '', pic: 'https://ui-avatars.com/api/?name=MA&background=94a3b8&color=fff&size=96&bold=true' },
+// 데모 계정 데이터
+var DEMO = {
+  'bts.bighitofficial': { name:'BTS official', f:80000000, fg:13, p:58, pic:'https://ui-avatars.com/api/?name=BTS&background=7c3aed&color=fff&size=96&bold=true' },
+  'blackpinkofficial': { name:'BLACKPINK', f:68000000, fg:5, p:492, pic:'https://ui-avatars.com/api/?name=BP&background=ec4899&color=fff&size=96&bold=true' },
+  'instaget_official': { name:'INSTAGET', f:1250, fg:320, p:87, pic:'https://ui-avatars.com/api/?name=IG&background=6366f1&color=fff&size=96&bold=true' },
+  'nike': { name:'Nike', f:306000000, fg:141, p:1203, pic:'https://ui-avatars.com/api/?name=NK&background=111&color=fff&size=96&bold=true' },
+  'sample_shop': { name:'Sample Beauty', f:3200, fg:890, p:145, pic:'https://ui-avatars.com/api/?name=SB&background=e879a8&color=fff&size=96&bold=true' },
+  'my_cafe': { name:'My Cafe Seoul', f:850, fg:420, p:62, pic:'https://ui-avatars.com/api/?name=MC&background=f59e0b&color=fff&size=96&bold=true' },
+  'new_creator': { name:'', f:230, fg:180, p:15, pic:'https://ui-avatars.com/api/?name=NC&background=94a3b8&color=fff&size=96&bold=true' },
+};
+
+// 상담 상태 관리
+var STATE = {
+  step: 'username',  // username → profile → purpose → goal → roadmap
+  account: null,
+  purpose: null,
+  goal: null,
+  history: {}        // 재방문 고객 저장
 };
 
 var isOpen = false;
@@ -211,209 +211,366 @@ function toggleWidget() {
   if (isOpen) document.getElementById('chatInput').focus();
 }
 
-function tryAccount(username) {
-  document.getElementById('chatInput').value = username;
-  sendMessage();
-}
-
 function scrollToBottom() {
-  var body = document.getElementById('chatBody');
-  setTimeout(function() { body.scrollTop = body.scrollHeight; }, 50);
+  var b = document.getElementById('chatBody');
+  setTimeout(function() { b.scrollTop = b.scrollHeight; }, 80);
 }
 
-function addBotMsg(html) {
-  var body = document.getElementById('chatBody');
-  var div = document.createElement('div');
-  div.className = 'msg msg-bot';
-  div.innerHTML = '<div class="msg-avatar">IG</div><div>' + html + '</div>';
-  body.appendChild(div);
-  scrollToBottom();
+function addBot(html) {
+  var b = document.getElementById('chatBody');
+  var d = document.createElement('div');
+  d.className = 'msg msg-bot';
+  d.innerHTML = '<div class="msg-avatar">IG</div><div>' + html + '</div>';
+  b.appendChild(d); scrollToBottom();
 }
 
-function addUserMsg(text) {
-  var body = document.getElementById('chatBody');
-  var div = document.createElement('div');
-  div.className = 'msg msg-user';
-  div.innerHTML = '<div class="msg-avatar">U</div><div class="msg-bubble">' + text + '</div>';
-  body.appendChild(div);
-  scrollToBottom();
+function addUser(text) {
+  var b = document.getElementById('chatBody');
+  var d = document.createElement('div');
+  d.className = 'msg msg-user';
+  d.innerHTML = '<div class="msg-avatar">U</div><div class="msg-bubble">' + text + '</div>';
+  b.appendChild(d); scrollToBottom();
 }
 
 function addTyping() {
-  var body = document.getElementById('chatBody');
-  var div = document.createElement('div');
-  div.className = 'msg msg-bot'; div.id = 'typing';
-  div.innerHTML = '<div class="msg-avatar">IG</div><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
-  body.appendChild(div);
-  scrollToBottom();
+  var b = document.getElementById('chatBody');
+  var d = document.createElement('div');
+  d.className = 'msg msg-bot'; d.id = 'typing';
+  d.innerHTML = '<div class="msg-avatar">IG</div><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+  b.appendChild(d); scrollToBottom();
 }
-function removeTyping() { var el = document.getElementById('typing'); if (el) el.remove(); }
+function removeTyping() { var e = document.getElementById('typing'); if (e) e.remove(); }
 
-function sendMessage() {
+function setInput(placeholder, btnText) {
+  document.getElementById('chatInput').placeholder = placeholder || '@username 입력';
+  document.getElementById('sendBtn').textContent = btnText || '전송';
+}
+
+// 시작
+function startChat() {
+  addBot('<div class="msg-bubble">안녕하세요! INSTAGET 성장 컨설턴트입니다.<br><br>먼저 <b>분석할 계정의 유저네임</b>을 알려주세요.</div>');
+  setTimeout(function() {
+    addBot('<div class="msg-bubble"><span style="font-size:12px;color:#888;">체험 계정을 눌러보세요</span><br>' +
+      '<span class="try-btn" onclick="selectAccount(\'sample_shop\')">sample_shop</span>' +
+      '<span class="try-btn" onclick="selectAccount(\'my_cafe\')">my_cafe</span>' +
+      '<span class="try-btn" onclick="selectAccount(\'new_creator\')">new_creator</span>' +
+      '<span class="try-btn" onclick="selectAccount(\'instaget_official\')">instaget_official</span>' +
+      '</div>');
+  }, 500);
+  STATE.step = 'username';
+  setInput('@username 입력', '분석');
+}
+
+function handleInput() {
   var input = document.getElementById('chatInput');
-  var username = input.value.replace('@', '').trim().toLowerCase();
-  if (!username) return;
+  var val = input.value.trim();
+  if (!val) return;
+  input.value = '';
 
+  if (STATE.step === 'username') {
+    selectAccount(val.replace('@','').toLowerCase());
+  }
+}
+
+// 1단계: 계정 선택
+function selectAccount(username) {
   if (!/^[a-zA-Z0-9._]{1,30}$/.test(username)) {
-    addBotMsg('<div class="msg-bubble">올바른 유저네임을 입력해주세요.<br><span style="font-size:12px;color:#888;">영문, 숫자, 밑줄(_), 마침표(.)만 가능</span></div>');
+    addBot('<div class="msg-bubble">올바른 유저네임을 입력해주세요.<br><span style="font-size:12px;color:#888;">영문, 숫자, 밑줄, 마침표만 가능</span></div>');
     return;
   }
 
-  document.getElementById('sendBtn').disabled = true;
-  input.disabled = true;
-  addUserMsg('@' + username);
-  input.value = '';
+  addUser('@' + username);
   addTyping();
 
   setTimeout(function() {
     removeTyping();
 
-    var demo = DEMO_ACCOUNTS[username];
-    if (demo) {
-      var data = { username: username, fullName: demo.fullName, followers: demo.followers, following: demo.following, posts: demo.posts, biography: demo.bio, profilePicUrl: demo.pic };
-      renderChatResults(data);
-    } else {
-      addBotMsg('<div class="msg-bubble"><b>@' + username + '</b> 계정을 찾을 수 없습니다.<br><br><span style="font-size:12px;color:#888;">데모에서 체험 가능한 계정:</span><br>' +
-        '<span class="try-btn" onclick="tryAccount(\'bts.bighitofficial\')">bts.bighitofficial</span>' +
-        '<span class="try-btn" onclick="tryAccount(\'instaget_official\')">instaget_official</span>' +
-        '<span class="try-btn" onclick="tryAccount(\'sample_shop\')">sample_shop</span>' +
-        '<span class="try-btn" onclick="tryAccount(\'my_new_account\')">my_new_account</span>' +
-        '</div>');
+    var demo = DEMO[username];
+    if (!demo) {
+      // 없는 계정이면 랜덤 생성
+      demo = { name: username, f: Math.floor(Math.random()*8000)+200, fg: Math.floor(Math.random()*600)+50, p: Math.floor(Math.random()*150)+5, pic: 'https://ui-avatars.com/api/?name='+encodeURIComponent(username)+'&background=6366f1&color=fff&size=96&bold=true' };
     }
 
-    document.getElementById('sendBtn').disabled = false;
-    input.disabled = false;
-    input.focus();
-  }, 1800);
-}
+    STATE.account = { username: username, followers: demo.f, following: demo.fg, posts: demo.p, name: demo.name, pic: demo.pic };
 
-function renderChatResults(data) {
-  var followers = data.followers || 0;
-  var following = data.following || 0;
-  var posts = data.posts || 0;
+    // 재방문 고객 체크
+    if (STATE.history[username]) {
+      showReturning(username);
+      return;
+    }
 
-  var fallbackUrl = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(data.username) + '&background=6366f1&color=fff&size=96&bold=true&length=2';
-  var imgSrc = data.profilePicUrl || fallbackUrl;
-  var profileImg = '<img class="chat-profile-img" src="' + imgSrc + '" alt="' + data.username + '" />';
-
-  var bioHtml = data.biography ? '<div class="chat-profile-bio">' + data.biography + '</div>' : '';
-
-  addBotMsg(
-    '<div class="chat-profile">' +
-      '<div class="chat-profile-top">' + profileImg +
-        '<div><div class="chat-profile-name">@' + data.username + '</div>' +
-        (data.fullName ? '<div class="chat-profile-fullname">' + data.fullName + '</div>' : '') +
-        bioHtml +
-        '</div></div>' +
-      '<div class="chat-profile-stats">' +
-        '<div><div class="chat-stat-num">' + formatNum(followers) + '</div><div class="chat-stat-label">팔로워</div></div>' +
-        '<div><div class="chat-stat-num">' + formatNum(following) + '</div><div class="chat-stat-label">팔로잉</div></div>' +
-        '<div><div class="chat-stat-num">' + formatNum(posts) + '</div><div class="chat-stat-label">게시물</div></div>' +
-      '</div>' +
-    '</div>'
-  );
-
-  // 참여율 추정
-  var estEng;
-  if (followers < 1000) estEng = 5.0;
-  else if (followers < 5000) estEng = 3.5;
-  else if (followers < 10000) estEng = 2.8;
-  else if (followers < 50000) estEng = 2.0;
-  else if (followers < 100000) estEng = 1.5;
-  else estEng = 1.0;
-  var engRate = (estEng * (0.3 + Math.random() * 1.0)).toFixed(1);
-  if (parseFloat(engRate) > 8) engRate = '7.2';
-  var eng = parseFloat(engRate);
-
-  var fScore = followers < 500 ? 15 : followers < 1000 ? 25 : followers < 3000 ? 40 : followers < 5000 ? 55 : followers < 10000 ? 70 : followers < 50000 ? 85 : 95;
-  var eScore = eng < 1 ? 20 : eng < 2 ? 35 : eng < 3 ? 50 : eng < 5 ? 70 : 90;
-  var rScore = following === 0 ? 50 : (followers/following > 3 ? 90 : followers/following > 1 ? 70 : followers/following > 0.5 ? 45 : 25);
-  var aScore = posts < 10 ? 20 : posts < 30 ? 35 : posts < 100 ? 55 : posts < 300 ? 75 : 90;
-  var total = Math.floor(fScore * 0.25 + eScore * 0.35 + rScore * 0.2 + aScore * 0.2);
-  var scoreClass = total >= 70 ? 'good' : total >= 40 ? 'warn' : 'bad';
-
-  setTimeout(function() {
-    var desc = total >= 70 ? '건강한 계정입니다!' : total >= 40 ? '개선하면 더 성장할 수 있어요' : '적극적인 조치가 필요해요';
-    addBotMsg(
-      '<div class="chat-score">' +
-        '<div class="chat-score-circle ' + scoreClass + '">' + total + '</div>' +
-        '<div class="chat-score-text"><strong>계정 건강도 ' + total + '점</strong><br>' + desc + '</div>' +
-      '</div>'
+    // 프로필 카드 표시
+    addBot(
+      '<div class="chat-profile">' +
+        '<div class="chat-profile-top">' +
+          '<img class="chat-profile-img" src="' + demo.pic + '" />' +
+          '<div><div class="chat-profile-name">@' + username + '</div>' +
+          (demo.name ? '<div class="chat-profile-fullname">' + demo.name + '</div>' : '') +
+          '</div></div>' +
+        '<div class="chat-profile-stats">' +
+          '<div><div class="chat-stat-num">' + fmt(demo.f) + '</div><div class="chat-stat-label">팔로워</div></div>' +
+          '<div><div class="chat-stat-num">' + fmt(demo.fg) + '</div><div class="chat-stat-label">팔로잉</div></div>' +
+          '<div><div class="chat-stat-num">' + fmt(demo.p) + '</div><div class="chat-stat-label">게시물</div></div>' +
+        '</div></div>'
     );
 
-    setTimeout(function() {
-      var diagHTML = '<div class="chat-diag">';
-      if (eng < 1.5) diagHTML += diagItem('bad', '참여율 ' + engRate + '% - 평균(3~6%)보다 낮아요');
-      else if (eng < 3) diagHTML += diagItem('warn', '참여율 ' + engRate + '% - 개선 여지가 있어요');
-      else diagHTML += diagItem('good', '참여율 ' + engRate + '% - 우수해요!');
+    setTimeout(function() { showPurposeQuestion(); }, 600);
+  }, 1500);
+}
 
-      if (followers < 1000) diagHTML += diagItem('bad', '팔로워 ' + formatNum(followers) + ' - 1,000명 돌파가 필요해요');
-      else if (followers < 5000) diagHTML += diagItem('warn', '팔로워 ' + formatNum(followers) + ' - 5,000명을 목표로');
-      else if (followers < 10000) diagHTML += diagItem('warn', '팔로워 ' + formatNum(followers) + ' - 만 팔로워 도전!');
-      else diagHTML += diagItem('good', '팔로워 ' + formatNum(followers) + ' - 안정적인 규모');
+// 재방문 고객
+function showReturning(username) {
+  var prev = STATE.history[username];
+  addBot('<div class="msg-bubble">다시 오셨군요! <b>@' + username + '</b>님.<br><br>' +
+    '지난번에 <b>' + prev.purpose + '</b> 목적으로 상담하셨고,<br>' +
+    '<b>팔로워 ' + fmt(prev.goal) + '</b>을 목표로 하셨죠.<br><br>' +
+    '이어서 진행할까요?</div>');
 
-      var ffRatio = following / Math.max(followers, 1);
-      if (ffRatio > 0.3) diagHTML += diagItem('warn', '팔로잉 비율 ' + Math.floor(ffRatio*100) + '% - 줄이면 좋아요');
-      if (posts < 30) diagHTML += diagItem('warn', '게시물 ' + posts + '개 - 최소 30개는 필요해요');
-      diagHTML += '</div>';
-      addBotMsg(diagHTML);
-
-      setTimeout(function() {
-        addBotMsg('<div class="msg-bubble">분석 결과에 맞는 <b>성장 솔루션</b>을 추천드릴게요!</div>');
-
-        setTimeout(function() {
-          if (eng < 3) {
-            var needLikes = Math.max(30, Math.ceil(followers * 0.03));
-            addBotMsg(makeRec('urgent', '시급', '좋아요 늘리기',
-              '참여율을 높이려면 게시물당 좋아요 ' + needLikes + '개 필요', 'https://instaget.com/channel/instagram/1'));
-          }
-
-          setTimeout(function() {
-            if (followers < 1000) {
-              addBotMsg(makeRec('urgent', '시급', '팔로워 늘리기',
-                '1,000명 돌파까지 ' + formatNum(1000 - followers) + '명 필요!', 'https://instaget.com/channel/instagram/3'));
-            } else if (followers < 5000) {
-              addBotMsg(makeRec('recommend', '추천', '팔로워 늘리기',
-                '5,000명까지 ' + formatNum(5000 - followers) + '명 더 필요해요', 'https://instaget.com/channel/instagram/3'));
-            } else if (followers < 10000) {
-              addBotMsg(makeRec('recommend', '추천', '데일리 팔로워',
-                '10K 달성! 매일 꾸준히 성장하세요', 'https://instaget.com/channel/instagram/4'));
-            }
-
-            setTimeout(function() {
-              addBotMsg(makeRec('optional', '추가', '도달+노출',
-                '콘텐츠 노출을 높여 신규 유입 가속화', 'https://instaget.com/channel/instagram/18'));
-              setTimeout(function() {
-                addBotMsg('<div class="msg-bubble">다른 계정도 분석해볼까요?<br><span style="font-size:12px;color:#888;">유저네임을 입력해주세요</span></div>');
-              }, 300);
-            }, 400);
-          }, 400);
-        }, 300);
-      }, 500);
-    }, 600);
+  setTimeout(function() {
+    addBot('<div class="choice-wrap">' +
+      '<button class="choice-btn" onclick="continueConsult()">네, 이어서 진행할게요</button>' +
+      '<button class="choice-btn" onclick="resetConsult()">아니요, 새로 상담할게요</button>' +
+      '</div>');
   }, 500);
 }
 
-function diagItem(type, text) {
-  return '<div class="chat-diag-item"><div class="chat-diag-dot ' + type + '"></div><div class="chat-diag-text">' + text + '</div></div>';
+function continueConsult() {
+  addUser('이어서 진행할게요');
+  var prev = STATE.history[STATE.account.username];
+  STATE.purpose = prev.purpose;
+  STATE.goal = prev.goal;
+  addTyping();
+  setTimeout(function() {
+    removeTyping();
+    showRoadmap();
+  }, 1000);
 }
 
-function makeRec(tagType, tagText, title, desc, url) {
-  return '<div class="chat-rec" onclick="window.open(\'' + url + '\',\'_blank\')">' +
-    '<span class="chat-rec-tag ' + tagType + '">' + tagText + '</span>' +
-    '<div class="chat-rec-title">' + title + '</div>' +
-    '<div class="chat-rec-desc">' + desc + '</div>' +
-    '<a class="chat-rec-btn" href="' + url + '" target="_blank" onclick="event.stopPropagation()">바로가기</a></div>';
+function resetConsult() {
+  addUser('새로 상담할게요');
+  delete STATE.history[STATE.account.username];
+  setTimeout(function() { showPurposeQuestion(); }, 500);
 }
 
-function formatNum(n) {
-  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
-  if (n >= 10000) return (n / 10000).toFixed(1) + '만';
+// 2단계: 목적 질문
+function showPurposeQuestion() {
+  addBot('<div class="msg-bubble"><b>@' + STATE.account.username + '</b>님의 계정 확인했습니다!<br><br>계정을 키우려는 <b>목적</b>이 뭔가요?</div>');
+
+  setTimeout(function() {
+    addBot('<div class="choice-wrap">' +
+      '<button class="choice-btn" onclick="selectPurpose(\'influencer\')">인플루언서로 성장<span class="sub">팬/팔로워 확보, 브랜드 협업</span></button>' +
+      '<button class="choice-btn" onclick="selectPurpose(\'business\')">쇼핑몰/브랜드 홍보<span class="sub">상품 판매, 브랜드 인지도</span></button>' +
+      '<button class="choice-btn" onclick="selectPurpose(\'personal\')">개인 브랜딩<span class="sub">전문성 어필, 포트폴리오</span></button>' +
+      '<button class="choice-btn" onclick="selectPurpose(\'quick\')">빠르게 늘리고 싶어요<span class="sub">팔로워/좋아요 바로 필요</span></button>' +
+      '</div>');
+    STATE.step = 'purpose';
+  }, 600);
+}
+
+// 3단계: 목적 선택 → 목표 질문
+function selectPurpose(purpose) {
+  var labels = { influencer: '인플루언서로 성장', business: '쇼핑몰/브랜드 홍보', personal: '개인 브랜딩', quick: '빠르게 늘리고 싶어요' };
+  STATE.purpose = labels[purpose];
+  addUser(labels[purpose]);
+  addTyping();
+
+  setTimeout(function() {
+    removeTyping();
+    if (purpose === 'quick') {
+      // 빠르게 늘리기 → 바로 상품 추천
+      STATE.goal = nextMilestone(STATE.account.followers);
+      showQuickRecommend();
+    } else {
+      showGoalQuestion(purpose);
+    }
+  }, 1000);
+}
+
+function showGoalQuestion(purpose) {
+  var f = STATE.account.followers;
+  var milestones = getMilestones(f);
+
+  addBot('<div class="msg-bubble">좋습니다! <b>' + STATE.purpose + '</b>이 목표시군요.<br><br>현재 팔로워 <b>' + fmt(f) + '</b>명인데,<br><b>어디까지 성장</b>하고 싶으세요?</div>');
+
+  setTimeout(function() {
+    var btns = '';
+    milestones.forEach(function(m) {
+      btns += '<button class="choice-btn" onclick="selectGoal(' + m.value + ')">' + m.label + '<span class="sub">' + m.desc + '</span></button>';
+    });
+    addBot('<div class="choice-wrap">' + btns + '</div>');
+    STATE.step = 'goal';
+  }, 600);
+}
+
+function getMilestones(f) {
+  var all = [
+    { value: 1000, label: '1,000 팔로워', desc: '첫 번째 마일스톤' },
+    { value: 3000, label: '3,000 팔로워', desc: '마이크로 인플루언서 시작' },
+    { value: 5000, label: '5,000 팔로워', desc: '브랜드 협업 가능' },
+    { value: 10000, label: '1만 팔로워', desc: '스와이프 링크 활성화' },
+    { value: 50000, label: '5만 팔로워', desc: '본격 인플루언서' },
+    { value: 100000, label: '10만 팔로워', desc: '메가 인플루언서' },
+    { value: 500000, label: '50만 팔로워', desc: '톱 크리에이터' },
+    { value: 1000000, label: '100만 팔로워', desc: '셀럽 레벨' },
+  ];
+  // 현재보다 큰 것만 3~4개
+  var filtered = all.filter(function(m) { return m.value > f; });
+  return filtered.slice(0, 4);
+}
+
+function nextMilestone(f) {
+  var ms = [1000,3000,5000,10000,50000,100000,500000,1000000];
+  for (var i = 0; i < ms.length; i++) { if (ms[i] > f) return ms[i]; }
+  return f * 2;
+}
+
+// 4단계: 목표 선택 → 로드맵
+function selectGoal(goal) {
+  STATE.goal = goal;
+  addUser('팔로워 ' + fmt(goal));
+  addTyping();
+
+  setTimeout(function() {
+    removeTyping();
+    showRoadmap();
+  }, 1500);
+}
+
+// 5단계: 맞춤 로드맵 생성
+function showRoadmap() {
+  var f = STATE.account.followers;
+  var goal = STATE.goal;
+  var gap = goal - f;
+
+  // 고객 정보 저장
+  STATE.history[STATE.account.username] = {
+    purpose: STATE.purpose,
+    goal: goal,
+    followers: f,
+    date: new Date().toLocaleDateString()
+  };
+
+  addBot('<div class="msg-bubble">현재 <b>' + fmt(f) + '</b> → 목표 <b>' + fmt(goal) + '</b><br><b>' + fmt(gap) + '명</b>을 늘려야 합니다.<br><br>한번에 올리기보다 <b>단계별로</b> 가는 게 자연스럽고 효과적이에요.</div>');
+
+  setTimeout(function() {
+    var steps = buildSteps(f, goal);
+    var roadmapHTML = '<div class="roadmap"><h4>맞춤 성장 로드맵</h4>';
+    steps.forEach(function(s, i) {
+      roadmapHTML += '<div class="roadmap-step">' +
+        '<div class="roadmap-dot step' + (i+1) + '">' + (i+1) + '</div>' +
+        '<div class="roadmap-line"></div>' +
+        '<div class="roadmap-content">' +
+          '<div class="roadmap-title">' + s.title + '</div>' +
+          '<div class="roadmap-desc">' + s.desc + '</div>' +
+          '<div class="roadmap-products">' + s.products.map(function(p) { return '<span class="roadmap-product">' + p + '</span>'; }).join('') + '</div>' +
+        '</div></div>';
+    });
+    roadmapHTML += '</div>';
+    addBot(roadmapHTML);
+
+    setTimeout(function() {
+      addBot('<div class="msg-bubble"><b>1단계부터 시작</b>하는 걸 추천드려요!<br><br>꾸준히 하시면 ' + estimateTime(f, goal) + ' 안에 목표 달성할 수 있습니다.</div>');
+
+      setTimeout(function() {
+        // 1단계 상품 추천
+        var step1 = steps[0];
+        addBot('<div class="chat-rec" onclick="window.open(\'https://instaget.com\',\'_blank\')">' +
+          '<span class="chat-rec-tag start">1단계 시작하기</span>' +
+          '<div class="chat-rec-title">' + step1.title + '</div>' +
+          '<div class="chat-rec-desc">' + step1.products.join(' + ') + ' 조합으로 시작</div>' +
+          '<a class="chat-rec-btn" href="https://instaget.com" target="_blank" onclick="event.stopPropagation()">INSTAGET에서 시작하기</a></div>');
+
+        setTimeout(function() {
+          addBot('<div class="msg-bubble">다른 계정도 분석해볼까요?<br>유저네임을 입력해주세요!<br><br><span style="font-size:12px;color:#888;">* 이전 상담 내용은 저장되어 있어요</span></div>');
+          STATE.step = 'username';
+          setInput('@username 입력', '분석');
+        }, 500);
+      }, 600);
+    }, 800);
+  }, 800);
+}
+
+// 빠르게 늘리기
+function showQuickRecommend() {
+  var f = STATE.account.followers;
+  var target = nextMilestone(f);
+  var need = target - f;
+
+  addBot('<div class="msg-bubble">현재 <b>' + fmt(f) + '</b>명이시니,<br>다음 목표는 <b>' + fmt(target) + '</b>명이에요!<br><br>바로 시작할 수 있는 조합을 추천드릴게요.</div>');
+
+  setTimeout(function() {
+    addBot('<div class="chat-rec" onclick="window.open(\'https://instaget.com/channel/instagram/3\',\'_blank\')">' +
+      '<span class="chat-rec-tag start">바로 시작</span>' +
+      '<div class="chat-rec-title">팔로워 ' + fmt(need) + '명 + 좋아요</div>' +
+      '<div class="chat-rec-desc">팔로워만 올리면 참여율이 떨어져요. 좋아요도 함께 해야 자연스럽습니다.</div>' +
+      '<a class="chat-rec-btn" href="https://instaget.com/channel/instagram/3" target="_blank" onclick="event.stopPropagation()">INSTAGET에서 구매하기</a></div>');
+
+    STATE.history[STATE.account.username] = { purpose: STATE.purpose, goal: target, followers: f, date: new Date().toLocaleDateString() };
+
+    setTimeout(function() {
+      addBot('<div class="msg-bubble">다른 계정도 분석해볼까요?</div>');
+      STATE.step = 'username';
+      setInput('@username 입력', '분석');
+    }, 500);
+  }, 800);
+}
+
+// 단계 생성 로직
+function buildSteps(current, goal) {
+  var steps = [];
+  var milestones = [1000,3000,5000,10000,30000,50000,100000,300000,500000,1000000];
+  var targets = milestones.filter(function(m) { return m > current && m <= goal; });
+  if (targets[targets.length-1] !== goal) targets.push(goal);
+  if (targets.length > 3) targets = [targets[0], targets[Math.floor(targets.length/2)], targets[targets.length-1]];
+
+  var prev = current;
+  targets.forEach(function(t, i) {
+    var gap = t - prev;
+    var s = {};
+    if (i === 0) {
+      s.title = fmt(prev) + ' → ' + fmt(t);
+      if (gap <= 2000) {
+        s.desc = '기반 다지기. 팔로워를 늘리면서 콘텐츠 꾸준히 올리세요.';
+        s.products = ['팔로워 늘리기', '좋아요 늘리기'];
+      } else {
+        s.desc = '데일리 팔로워로 자연스럽게 성장하면서, 1일 1피드를 유지하세요.';
+        s.products = ['데일리 팔로워', '좋아요 늘리기', '1일 1피드'];
+      }
+    } else if (i === 1) {
+      s.title = fmt(prev) + ' → ' + fmt(t);
+      s.desc = '릴스 콘텐츠에 집중하세요. 릴스 조회수를 높이면 자연 유입이 폭발적으로 늘어납니다.';
+      s.products = ['데일리 팔로워', '릴스 조회수', '도달+노출'];
+    } else {
+      s.title = fmt(prev) + ' → ' + fmt(t);
+      s.desc = '상위 노출과 브랜딩에 집중할 단계입니다. 꾸준한 활동이 핵심이에요.';
+      s.products = ['데일리 팔로워', '상위노출', '도달+노출', '좋아요'];
+    }
+    steps.push(s);
+    prev = t;
+  });
+
+  return steps;
+}
+
+function estimateTime(current, goal) {
+  var gap = goal - current;
+  if (gap <= 500) return '약 1~2주';
+  if (gap <= 2000) return '약 1개월';
+  if (gap <= 5000) return '약 2~3개월';
+  if (gap <= 20000) return '약 3~6개월';
+  if (gap <= 100000) return '약 6~12개월';
+  return '약 1년 이상';
+}
+
+function fmt(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 10000) return (n/10000).toFixed(1) + '만';
   return n.toLocaleString();
 }
 
-// 1초 후 위젯 자동 오픈
-setTimeout(function() { if (!isOpen) toggleWidget(); }, 1000);
+// 시작
+startChat();
+setTimeout(function() { if (!isOpen) toggleWidget(); }, 800);
 </script>
 </body>
 </html>
