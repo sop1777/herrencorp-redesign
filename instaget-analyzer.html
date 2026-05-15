@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INSTAGET - Account Analyzer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; background: #f0f0f0; min-height: 100vh; }
+
+  .demo-bg { padding: 60px 20px; text-align: center; }
+  .demo-bg h2 { color: #333; font-size: 22px; margin-bottom: 8px; }
+  .demo-bg p { color: #999; font-size: 14px; margin-bottom: 4px; }
+
+  .widget-trigger {
+    position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+    width: 60px; height: 60px; border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border: none; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.4);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    color: #fff; font-size: 24px;
+  }
+  .widget-trigger:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(99,102,241,0.5); }
+  .widget-trigger.open .icon-open { display: none; }
+  .widget-trigger:not(.open) .icon-close { display: none; }
+
+  .widget-panel {
+    position: fixed; bottom: 96px; right: 24px; z-index: 9998;
+    width: 380px; max-height: 600px;
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+    display: none; flex-direction: column; overflow: hidden;
+    animation: slideUp 0.3s ease;
+  }
+  .widget-panel.show { display: flex; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .widget-header {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff; padding: 20px; flex-shrink: 0;
+  }
+  .widget-header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .widget-logo { width: 40px; height: 40px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: #6366f1; }
+  .widget-header h3 { font-size: 17px; font-weight: 700; }
+  .widget-header p { font-size: 12px; opacity: 0.8; margin-left: 52px; }
+
+  .widget-body {
+    flex: 1; overflow-y: auto; padding: 16px;
+    display: flex; flex-direction: column; gap: 12px;
+    max-height: 420px;
+  }
+
+  .msg { display: flex; gap: 8px; align-items: flex-start; }
+  .msg-bot { flex-direction: row; }
+  .msg-user { flex-direction: row-reverse; }
+  .msg-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, #6366f1, #8b5cf6); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; }
+  .msg-user .msg-avatar { background: #e5e7eb; color: #666; }
+  .msg-bubble { max-width: 280px; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5; }
+  .msg-bot .msg-bubble { background: #f3f4f6; color: #333; border-top-left-radius: 4px; }
+  .msg-user .msg-bubble { background: #6366f1; color: #fff; border-top-right-radius: 4px; }
+
+  .chat-profile {
+    background: #f8f9fc; border-radius: 14px; padding: 16px; max-width: 300px;
+  }
+  .chat-profile-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .chat-profile-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #e5e7eb; }
+  .chat-profile-img-placeholder { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #f472b6, #c084fc); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 20px; }
+  .chat-profile-name { font-weight: 700; font-size: 15px; }
+  .chat-profile-fullname { font-size: 12px; color: #888; }
+  .chat-profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+  .chat-stat-num { font-size: 16px; font-weight: 800; color: #6366f1; }
+  .chat-stat-label { font-size: 11px; color: #888; }
+
+  .chat-score { display: flex; align-items: center; gap: 12px; background: #f8f9fc; border-radius: 14px; padding: 16px; max-width: 300px; }
+  .chat-score-circle { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; flex-shrink: 0; }
+  .chat-score-circle.good { background: #dcfce7; color: #16a34a; }
+  .chat-score-circle.warn { background: #fef9c3; color: #ca8a04; }
+  .chat-score-circle.bad { background: #fee2e2; color: #dc2626; }
+  .chat-score-text { font-size: 13px; line-height: 1.4; color: #555; }
+  .chat-score-text strong { color: #222; }
+
+  .chat-diag { background: #f8f9fc; border-radius: 14px; padding: 14px; max-width: 300px; }
+  .chat-diag-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+  .chat-diag-item:last-child { margin-bottom: 0; }
+  .chat-diag-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .chat-diag-dot.bad { background: #ef4444; }
+  .chat-diag-dot.warn { background: #eab308; }
+  .chat-diag-dot.good { background: #22c55e; }
+  .chat-diag-text { font-size: 13px; color: #555; line-height: 1.4; }
+
+  .chat-rec { background: #fff; border: 1.5px solid #6366f1; border-radius: 14px; padding: 14px; max-width: 300px; cursor: pointer; transition: transform 0.2s; }
+  .chat-rec:hover { transform: translateY(-1px); }
+  .chat-rec-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; }
+  .chat-rec-tag.urgent { background: #fee2e2; color: #dc2626; }
+  .chat-rec-tag.recommend { background: #dbeafe; color: #2563eb; }
+  .chat-rec-tag.optional { background: #f3f4f6; color: #6b7280; }
+  .chat-rec-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .chat-rec-desc { font-size: 12px; color: #888; line-height: 1.4; margin-bottom: 8px; }
+  .chat-rec-btn { display: inline-block; padding: 8px 16px; background: #6366f1; color: #fff; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; }
+  .chat-rec-btn:hover { background: #4f46e5; }
+
+  .widget-input {
+    padding: 12px 16px; border-top: 1px solid #f0f0f0; flex-shrink: 0;
+    display: flex; gap: 8px; align-items: center; background: #fff;
+  }
+  .widget-input input {
+    flex: 1; padding: 10px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px;
+    font-size: 14px; outline: none; transition: border 0.2s;
+  }
+  .widget-input input:focus { border-color: #6366f1; }
+  .widget-input input::placeholder { color: #bbb; }
+  .widget-input button {
+    padding: 10px 16px; background: #6366f1; color: #fff; border: none;
+    border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;
+    white-space: nowrap;
+  }
+  .widget-input button:hover { background: #4f46e5; }
+  .widget-input button:disabled { background: #c4b5fd; cursor: not-allowed; }
+
+  .typing-dots { display: flex; gap: 4px; padding: 8px 0; }
+  .typing-dots span { width: 8px; height: 8px; background: #c4b5fd; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
+  .typing-dots span:nth-child(1) { animation-delay: 0s; }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+
+  .widget-footer { text-align: center; padding: 8px; font-size: 11px; color: #bbb; border-top: 1px solid #f5f5f5; flex-shrink: 0; }
+  .widget-footer span { color: #6366f1; font-weight: 600; }
+
+  @media (max-width: 420px) {
+    .widget-panel { width: calc(100vw - 16px); right: 8px; bottom: 88px; max-height: 80vh; }
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-bg">
+  <h2>INSTAGET Account Analyzer</h2>
+  <p>우측 하단 버튼을 눌러 계정 분석 위젯을 열어보세요</p>
+  <p style="color:#bbb;font-size:12px;margin-top:20px;">* 데모 버전 - 실제 인스타그램 데이터가 아닌 시뮬레이션입니다</p>
+</div>
+
+<button class="widget-trigger" id="triggerBtn" onclick="toggleWidget()">
+  <span class="icon-open">&#128172;</span>
+  <span class="icon-close">&#10005;</span>
+</button>
+
+<div class="widget-panel" id="widgetPanel">
+  <div class="widget-header">
+    <div class="widget-header-top">
+      <div class="widget-logo">IG</div>
+      <h3>INSTAGET</h3>
+    </div>
+    <p>계정을 분석하고 맞춤 성장 솔루션을 받아보세요</p>
+  </div>
+
+  <div class="widget-body" id="chatBody">
+    <div class="msg msg-bot">
+      <div class="msg-avatar">IG</div>
+      <div class="msg-bubble">
+        안녕하세요! INSTAGET 계정 분석기입니다.<br><br>
+        분석하고 싶은 인스타그램 <b>공개 계정의 유저네임</b>을 입력해주세요.
+      </div>
+    </div>
+  </div>
+
+  <div class="widget-input">
+    <input type="text" id="chatInput" placeholder="@username 입력" onkeydown="if(event.key==='Enter')sendMessage()" />
+    <button id="sendBtn" onclick="sendMessage()">분석</button>
+  </div>
+  <div class="widget-footer">Powered by <span>INSTAGET</span></div>
+</div>
+
+<script>
+// 데모 데이터 (실제 서비스에서는 서버 API로 대체)
+var DEMO_ACCOUNTS = {
+  'bts.bighitofficial': { fullName: 'BTS official', followers: 80000000, following: 13, posts: 58, bio: "BTS 'ARIRANG' OUT NOW" },
+  'blackpinkofficial': { fullName: 'BLACKPINK', followers: 68000000, following: 5, posts: 492, bio: 'BLACKPINK IN YOUR AREA' },
+  'roses_are_rosie': { fullName: 'ROSE', followers: 78000000, following: 52, posts: 873, bio: '' },
+  'instaget_official': { fullName: 'INSTAGET', followers: 1250, following: 320, posts: 87, bio: 'Instagram Marketing Solution' },
+};
+
+var isOpen = false;
+
+function toggleWidget() {
+  isOpen = !isOpen;
+  document.getElementById('widgetPanel').classList.toggle('show', isOpen);
+  document.getElementById('triggerBtn').classList.toggle('open', isOpen);
+  if (isOpen) document.getElementById('chatInput').focus();
+}
+
+function scrollToBottom() {
+  var body = document.getElementById('chatBody');
+  setTimeout(function() { body.scrollTop = body.scrollHeight; }, 50);
+}
+
+function addBotMsg(html) {
+  var body = document.getElementById('chatBody');
+  var div = document.createElement('div');
+  div.className = 'msg msg-bot';
+  div.innerHTML = '<div class="msg-avatar">IG</div><div>' + html + '</div>';
+  body.appendChild(div);
+  scrollToBottom();
+}
+
+function addUserMsg(text) {
+  var body = document.getElementById('chatBody');
+  var div = document.createElement('div');
+  div.className = 'msg msg-user';
+  div.innerHTML = '<div class="msg-avatar">U</div><div class="msg-bubble">' + text + '</div>';
+  body.appendChild(div);
+  scrollToBottom();
+}
+
+function addTyping() {
+  var body = document.getElementById('chatBody');
+  var div = document.createElement('div');
+  div.className = 'msg msg-bot'; div.id = 'typing';
+  div.innerHTML = '<div class="msg-avatar">IG</div><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+  body.appendChild(div);
+  scrollToBottom();
+}
+function removeTyping() { var el = document.getElementById('typing'); if (el) el.remove(); }
+
+function sendMessage() {
+  var input = document.getElementById('chatInput');
+  var username = input.value.replace('@', '').trim();
+  if (!username) return;
+
+  document.getElementById('sendBtn').disabled = true;
+  input.disabled = true;
+  addUserMsg('@' + username);
+  input.value = '';
+  addTyping();
+
+  // 데모: 2초 후 결과 (실제 서비스에서는 fetch('/analyze?username=...'))
+  setTimeout(function() {
+    removeTyping();
+
+    // 데모 데이터 또는 랜덤 생성
+    var demo = DEMO_ACCOUNTS[username];
+    var data;
+    if (demo) {
+      data = { username: username, fullName: demo.fullName, followers: demo.followers, following: demo.following, posts: demo.posts, biography: demo.bio };
+    } else {
+      // 아무 유저네임이나 넣으면 랜덤 데이터 생성
+      var f = Math.floor(Math.random() * 15000) + 200;
+      var fg = Math.floor(Math.random() * 800) + 50;
+      var p = Math.floor(Math.random() * 200) + 10;
+      data = { username: username, fullName: username, followers: f, following: fg, posts: p, biography: '' };
+    }
+
+    renderChatResults(data);
+
+    document.getElementById('sendBtn').disabled = false;
+    input.disabled = false;
+    input.focus();
+  }, 2000);
+}
+
+function renderChatResults(data) {
+  var followers = data.followers || 0;
+  var following = data.following || 0;
+  var posts = data.posts || 0;
+
+  var initial = (data.username || '?').charAt(0).toUpperCase();
+  var profileImg = '<div class="chat-profile-img-placeholder">' + initial + '</div>';
+
+  addBotMsg(
+    '<div class="chat-profile">' +
+      '<div class="chat-profile-top">' + profileImg +
+        '<div><div class="chat-profile-name">@' + data.username + '</div>' +
+        (data.fullName ? '<div class="chat-profile-fullname">' + data.fullName + '</div>' : '') +
+        '</div></div>' +
+      '<div class="chat-profile-stats">' +
+        '<div><div class="chat-stat-num">' + formatNum(followers) + '</div><div class="chat-stat-label">팔로워</div></div>' +
+        '<div><div class="chat-stat-num">' + formatNum(following) + '</div><div class="chat-stat-label">팔로잉</div></div>' +
+        '<div><div class="chat-stat-num">' + formatNum(posts) + '</div><div class="chat-stat-label">게시물</div></div>' +
+      '</div>' +
+    '</div>'
+  );
+
+  // 참여율 추정
+  var estEng;
+  if (followers < 1000) estEng = 5.0;
+  else if (followers < 5000) estEng = 3.5;
+  else if (followers < 10000) estEng = 2.8;
+  else if (followers < 50000) estEng = 2.0;
+  else if (followers < 100000) estEng = 1.5;
+  else estEng = 1.0;
+  var engRate = (estEng * (0.3 + Math.random() * 1.0)).toFixed(1);
+  if (parseFloat(engRate) > 8) engRate = '7.2';
+  var eng = parseFloat(engRate);
+
+  var fScore = followers < 500 ? 15 : followers < 1000 ? 25 : followers < 3000 ? 40 : followers < 5000 ? 55 : followers < 10000 ? 70 : followers < 50000 ? 85 : 95;
+  var eScore = eng < 1 ? 20 : eng < 2 ? 35 : eng < 3 ? 50 : eng < 5 ? 70 : 90;
+  var rScore = following === 0 ? 50 : (followers/following > 3 ? 90 : followers/following > 1 ? 70 : followers/following > 0.5 ? 45 : 25);
+  var aScore = posts < 10 ? 20 : posts < 30 ? 35 : posts < 100 ? 55 : posts < 300 ? 75 : 90;
+  var total = Math.floor(fScore * 0.25 + eScore * 0.35 + rScore * 0.2 + aScore * 0.2);
+  var scoreClass = total >= 70 ? 'good' : total >= 40 ? 'warn' : 'bad';
+
+  setTimeout(function() {
+    var desc = total >= 70 ? '건강한 계정입니다!' : total >= 40 ? '개선하면 더 성장할 수 있어요' : '적극적인 조치가 필요해요';
+    addBotMsg(
+      '<div class="chat-score">' +
+        '<div class="chat-score-circle ' + scoreClass + '">' + total + '</div>' +
+        '<div class="chat-score-text"><strong>계정 건강도 ' + total + '점</strong><br>' + desc + '</div>' +
+      '</div>'
+    );
+
+    setTimeout(function() {
+      var diagHTML = '<div class="chat-diag">';
+      if (eng < 1.5) diagHTML += diagItem('bad', '참여율 ' + engRate + '% - 평균(3~6%)보다 낮아요');
+      else if (eng < 3) diagHTML += diagItem('warn', '참여율 ' + engRate + '% - 개선 여지가 있어요');
+      else diagHTML += diagItem('good', '참여율 ' + engRate + '% - 우수해요!');
+
+      if (followers < 1000) diagHTML += diagItem('bad', '팔로워 ' + formatNum(followers) + ' - 1,000명 돌파가 필요해요');
+      else if (followers < 5000) diagHTML += diagItem('warn', '팔로워 ' + formatNum(followers) + ' - 5,000명을 목표로');
+      else if (followers < 10000) diagHTML += diagItem('warn', '팔로워 ' + formatNum(followers) + ' - 만 팔로워 도전!');
+      else diagHTML += diagItem('good', '팔로워 ' + formatNum(followers) + ' - 안정적인 규모');
+
+      var ffRatio = following / Math.max(followers, 1);
+      if (ffRatio > 0.3) diagHTML += diagItem('warn', '팔로잉 비율 ' + Math.floor(ffRatio*100) + '% - 줄이면 좋아요');
+      if (posts < 30) diagHTML += diagItem('warn', '게시물 ' + posts + '개 - 최소 30개는 필요해요');
+      diagHTML += '</div>';
+      addBotMsg(diagHTML);
+
+      setTimeout(function() {
+        addBotMsg('<div class="msg-bubble">분석 결과에 맞는 <b>성장 솔루션</b>을 추천드릴게요!</div>');
+
+        setTimeout(function() {
+          if (eng < 3) {
+            var needLikes = Math.max(30, Math.ceil(followers * 0.03));
+            addBotMsg(makeRec('urgent', '시급', '좋아요 늘리기',
+              '참여율을 높이려면 게시물당 좋아요 ' + needLikes + '개 필요', 'https://instaget.com/channel/instagram/1'));
+          }
+
+          setTimeout(function() {
+            if (followers < 1000) {
+              addBotMsg(makeRec('urgent', '시급', '팔로워 늘리기',
+                '1,000명 돌파까지 ' + formatNum(1000 - followers) + '명 필요!', 'https://instaget.com/channel/instagram/3'));
+            } else if (followers < 5000) {
+              addBotMsg(makeRec('recommend', '추천', '팔로워 늘리기',
+                '5,000명까지 ' + formatNum(5000 - followers) + '명 더 필요해요', 'https://instaget.com/channel/instagram/3'));
+            } else if (followers < 10000) {
+              addBotMsg(makeRec('recommend', '추천', '데일리 팔로워',
+                '10K 달성! 매일 꾸준히 성장하세요', 'https://instaget.com/channel/instagram/4'));
+            }
+
+            setTimeout(function() {
+              addBotMsg(makeRec('optional', '추가', '도달+노출',
+                '콘텐츠 노출을 높여 신규 유입 가속화', 'https://instaget.com/channel/instagram/18'));
+              setTimeout(function() {
+                addBotMsg('<div class="msg-bubble">다른 계정도 분석해볼까요?</div>');
+              }, 300);
+            }, 400);
+          }, 400);
+        }, 300);
+      }, 500);
+    }, 600);
+  }, 500);
+}
+
+function diagItem(type, text) {
+  return '<div class="chat-diag-item"><div class="chat-diag-dot ' + type + '"></div><div class="chat-diag-text">' + text + '</div></div>';
+}
+
+function makeRec(tagType, tagText, title, desc, url) {
+  return '<div class="chat-rec" onclick="window.open(\'' + url + '\',\'_blank\')">' +
+    '<span class="chat-rec-tag ' + tagType + '">' + tagText + '</span>' +
+    '<div class="chat-rec-title">' + title + '</div>' +
+    '<div class="chat-rec-desc">' + desc + '</div>' +
+    '<a class="chat-rec-btn" href="' + url + '" target="_blank" onclick="event.stopPropagation()">바로가기</a></div>';
+}
+
+function formatNum(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 10000) return (n / 10000).toFixed(1) + '만';
+  return n.toLocaleString();
+}
+</script>
+</body>
+</html>
