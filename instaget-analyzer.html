@@ -161,7 +161,8 @@
       <div class="msg-avatar">IG</div>
       <div class="msg-bubble">
         안녕하세요! INSTAGET 계정 분석기입니다.<br><br>
-        분석하고 싶은 인스타그램 <b>공개 계정의 유저네임</b>을 입력해주세요.
+        분석하고 싶은 인스타그램 <b>공개 계정의 유저네임</b>을 입력해주세요.<br><br>
+        <span style="font-size:12px;color:#888;">체험: bts.bighitofficial, blackpinkofficial, instaget_official</span>
       </div>
     </div>
   </div>
@@ -229,6 +230,12 @@ function sendMessage() {
   var username = input.value.replace('@', '').trim();
   if (!username) return;
 
+  // 유저네임 형식 검증 (인스타그램: 영문, 숫자, 밑줄, 마침표만 허용, 1~30자)
+  if (!/^[a-zA-Z0-9._]{1,30}$/.test(username)) {
+    addBotMsg('<div class="msg-bubble">올바른 인스타그램 유저네임을 입력해주세요.<br><br>유저네임은 <b>영문, 숫자, 밑줄(_), 마침표(.)</b>만 사용할 수 있어요.</div>');
+    return;
+  }
+
   document.getElementById('sendBtn').disabled = true;
   input.disabled = true;
   addUserMsg('@' + username);
@@ -239,20 +246,26 @@ function sendMessage() {
   setTimeout(function() {
     removeTyping();
 
-    // 데모 데이터 또는 랜덤 생성
-    var demo = DEMO_ACCOUNTS[username];
-    var data;
+    var demo = DEMO_ACCOUNTS[username.toLowerCase()];
     if (demo) {
-      data = { username: username, fullName: demo.fullName, followers: demo.followers, following: demo.following, posts: demo.posts, biography: demo.bio };
+      // 내장 데모 계정
+      var data = { username: username, fullName: demo.fullName, followers: demo.followers, following: demo.following, posts: demo.posts, biography: demo.bio };
+      renderChatResults(data);
     } else {
-      // 아무 유저네임이나 넣으면 랜덤 데이터 생성
-      var f = Math.floor(Math.random() * 15000) + 200;
-      var fg = Math.floor(Math.random() * 800) + 50;
-      var p = Math.floor(Math.random() * 200) + 10;
-      data = { username: username, fullName: username, followers: f, following: fg, posts: p, biography: '' };
+      // 등록되지 않은 계정 → 안내 메시지
+      addBotMsg('<div class="msg-bubble"><b>@' + username + '</b> 계정을 찾을 수 없습니다.<br><br>데모 버전에서는 아래 계정만 분석 가능합니다:</div>');
+      setTimeout(function() {
+        addBotMsg(
+          '<div style="background:#f8f9fc;border-radius:14px;padding:14px;max-width:300px;font-size:13px;line-height:2;">' +
+          '<b>체험 가능 계정:</b><br>' +
+          '<span style="cursor:pointer;color:#6366f1;font-weight:600;" onclick="document.getElementById(\'chatInput\').value=\'bts.bighitofficial\';sendMessage();">@ bts.bighitofficial</span><br>' +
+          '<span style="cursor:pointer;color:#6366f1;font-weight:600;" onclick="document.getElementById(\'chatInput\').value=\'blackpinkofficial\';sendMessage();">@ blackpinkofficial</span><br>' +
+          '<span style="cursor:pointer;color:#6366f1;font-weight:600;" onclick="document.getElementById(\'chatInput\').value=\'roses_are_rosie\';sendMessage();">@ roses_are_rosie</span><br>' +
+          '<span style="cursor:pointer;color:#6366f1;font-weight:600;" onclick="document.getElementById(\'chatInput\').value=\'instaget_official\';sendMessage();">@ instaget_official</span>' +
+          '<br><br><span style="color:#888;">실제 서비스에서는 모든 공개 계정 분석이 가능합니다.</span></div>'
+        );
+      }, 300);
     }
-
-    renderChatResults(data);
 
     document.getElementById('sendBtn').disabled = false;
     input.disabled = false;
